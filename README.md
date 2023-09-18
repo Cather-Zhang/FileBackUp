@@ -31,6 +31,7 @@ Optional Enhancements:
     Implement backup rotation: Keep a specified number of backup copies and delete older ones.
     Add options to exclude certain file types or directories from the backup.
     Create a log file that records backup operations with timestamps.
+    Add multi-threading to enhance the efficiency of this process.
 
 Example Usage:
 ```
