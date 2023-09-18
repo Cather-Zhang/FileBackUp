@@ -49,3 +49,8 @@ Docker Command (https://youtu.be/pr-pYhMDhgM):
 ```
 docker run -h <username> -v "<PathToFolder>":/root/host --rm -it ubuntu:20.04
 ```
+
+Install make within docker container:
+```
+apt-get update && apt-get install make
+```
