@@ -44,3 +44,8 @@ Backup completed successfully!
 Note: Be cautious when working with file operations in C, especially when handling user input and system calls. Always validate user input and handle errors gracefully.
 
 This project combines C for low-level file operations, a Makefile for building the program, and a Bash script for automation. It provides a practical solution for backing up files and directories.
+
+Docker Command (https://youtu.be/pr-pYhMDhgM):
+```
+docker run -h <username> -v "<PathToFolder>":/root/host --rm -it ubuntu:20.04
+```
