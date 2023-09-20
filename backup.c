@@ -1,42 +1,25 @@
 #include <stdio.h>
+#include <dirent.h>
 #include <assert.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <string.h>
-#include <stdlib.h>
 
-void testAddition() {
-    int i = 5;
-    assert(i == 5);
+void checkNewPath(char *path) {
+    int result = strcmp(path, "dummy_files_copy");
+    assert(result == 0);
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        return -1;
+    char path[100] = "dummy_files";
+    DIR *directory;
+    directory = opendir(path);
+    if (directory == NULL) {
+        printf("Directory doesn't exist");
     }
 
-    printf("Hello World\n");
+    strcat(path, "_copy");
+    printf("%s\n", path);
 
-    const char* sourceDirectory = (char*)malloc(strlen(argv[1]) + 1);
-    struct stat dirStat;
-    int result = stat(sourceDirectory, &dirStat);
-
-    if (result == 0) {
-        if (S_ISDIR(dirStat.st_mode)) {
-            printf("The directory '%s' exists.\n", sourceDirectory);
-            return 0;
-        } else {
-            printf("'%s' is not a directory.\n", sourceDirectory);
-            return -1;
-        }
-    }
-    else {
-        printf("%s is not a directory", sourceDirectory);
-        return -1;
-    }
-
-
-    testAddition();
+    checkNewPath(path);
 
     return 0;
 }
