@@ -64,3 +64,8 @@ Set the backup bash script to correct execute permission:
 ```
 chmod +x backup.sh
 ```
+
+Run the bash script:
+```
+./backup.sh
+```
