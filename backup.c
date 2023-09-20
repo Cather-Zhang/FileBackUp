@@ -2,6 +2,8 @@
 #include <assert.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <string.h>
+#include <stdlib.h>
 
 void testAddition() {
     int i = 5;
@@ -17,7 +19,7 @@ int main(int argc, char *argv[]) {
 
     const char* sourceDirectory = (char*)malloc(strlen(argv[1]) + 1);
     struct stat dirStat;
-    int result = stat(sourceDirectory, *dirStat);
+    int result = stat(sourceDirectory, &dirStat);
 
     if (result == 0) {
         if (S_ISDIR(dirStat.st_mode)) {
