@@ -52,5 +52,15 @@ docker run -h <username> -v "<PathToFolder>":/root/host --rm -it ubuntu:20.04
 
 Install make within docker container:
 ```
+apt-get update && apt-get install -y gcc
+```
+
+Install make within docker container:
+```
 apt-get update && apt-get install make
+```
+
+Set the backup bash script to correct execute permission:
+```
+chmod +x backup.sh
 ```
