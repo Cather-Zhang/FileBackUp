@@ -1,6 +1,6 @@
 #!/bin/bash
 
-make
+make -f MakeFile
 
 echo "Makefile compiling failed"
 
