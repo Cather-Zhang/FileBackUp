@@ -3,7 +3,8 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
-#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 
 void checkNewPath(char* path) {
@@ -11,30 +12,88 @@ void checkNewPath(char* path) {
     assert(result == 0);
 }
 
-void listFilesAndDirectories(char* sourcePath) {
+void copyFilesAndDirectories(char* sourcePath, char* targetPath) {
     struct dirent *dp;
     const char* pathSlash = "/";
 
+    printf("Input: %s and %s\n", sourcePath, targetPath);
+
     DIR *sourceDirectory = opendir(sourcePath);
     if (!sourceDirectory) {
-        printf("Source Directory %s Doesn't Exist\n", sourcePath);
+        printf("ERROR: Source Directory %s Doesn't Exist\n", sourcePath);
         return;
     }
+    printf("source dir opened\n");
+    struct stat info;
+
+    if (stat(targetPath, &info) != 0) {
+        printf("Target Directory %s Doesn't Exist, creating one now\n", targetPath);
+        mkdir(targetPath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        // Try to open the target dir again
+        
+    }
+    DIR* targetDirectory = opendir(targetPath);
+    if (!targetDirectory) {
+        printf("ERROR: Target Directory %s Doesn't Exist\n", targetPath);
+        return;
+    }
+    printf("target dir opened\n");
     
     while ((dp = readdir(sourceDirectory)) != NULL) {
         //skipping . and .. directories
-        if ((strcmp(dp->d_name, ".") != 0) && (strcmp(dp->d_name, "..") != 0)) {
-            printf("%s/%s\n", sourcePath, dp->d_name);
-            if (dp->d_type == DT_DIR) {
-                char* newPath = strndup(sourcePath, strlen(sourcePath));
-                strcat(newPath, pathSlash);
-                strcat(newPath, dp->d_name);
-                listFilesAndDirectories(newPath);
-            }
+        if ((strcmp(dp->d_name, ".") == 0) || (strcmp(dp->d_name, "..") == 0)) {
+            continue;
         }
 
+        printf("%s/%s\n", sourcePath, dp->d_name);
+
+        char* newSourcePath = strndup(sourcePath, strlen(sourcePath));
+        strcat(newSourcePath, pathSlash);
+        strcat(newSourcePath, dp->d_name);
+
+        char* newTargetPath = strndup(targetPath, strlen(targetPath));
+        strcat(newTargetPath, pathSlash);
+        strcat(newTargetPath, dp->d_name);
+
+        printf("NEW PATHS: %s to %s\n", newSourcePath, newTargetPath);
+
+        // If it is a folder, we recursively copy sub-directories
+        if (dp->d_type == DT_DIR) {
+            printf("%s is a directory, recursively calling the function\n", newSourcePath);
+            copyFilesAndDirectories(newSourcePath, newTargetPath);
+        }
+        else {
+            printf("It is a file\n");
+            FILE* sourceFile = fopen(newSourcePath, "rb");
+            if (sourceFile == NULL) {
+                printf("Error opening source file to be copied!\n");
+                //continue;
+            }
+            printf("source opened\n");
+            FILE* targetFile = fopen(newTargetPath, "wb");
+            
+            if (targetFile == NULL) {
+                printf("Error opening or creating target file\n");
+                //continue;
+            }
+
+            printf("copying");
+            char buffer[4096];
+            size_t bytes_read;
+            while ((bytes_read = fread(buffer, 1, sizeof(buffer), sourceFile)) > 0) {
+                fwrite(buffer, 1, bytes_read, targetFile);
+                printf(".");
+            }
+
+            printf("File %s copied successfully\n", newSourcePath);
+
+            fclose(sourceFile);
+            fclose(targetFile);
+        }
     }
 
+    closedir(sourceDirectory);
+    closedir(targetDirectory);
 
 }
 
@@ -58,7 +117,7 @@ int main(int argc, char *argv[]) {
     printf("Source directory: %s\n", sourceDirectoryName);
     printf("Target directory: %s\n", targetDirectoryName);
 
-    listFilesAndDirectories(sourceDirectoryName);
+    copyFilesAndDirectories(sourceDirectoryName, targetDirectoryName);
 
     return 0;
 }
