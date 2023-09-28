@@ -15,7 +15,8 @@ void checkNewPath(char* path) {
 void copyFilesAndDirectories(char* sourcePath, char* targetPath) {
     struct dirent *dp;
     const char* pathSlash = "/";
-
+    char newSourcePath[256];
+    char newTargetPath[256];
     printf("Input: %s and %s\n", sourcePath, targetPath);
 
     DIR *sourceDirectory = opendir(sourcePath);
@@ -23,7 +24,7 @@ void copyFilesAndDirectories(char* sourcePath, char* targetPath) {
         printf("ERROR: Source Directory %s Doesn't Exist\n", sourcePath);
         return;
     }
-    printf("source dir opened\n");
+    
     struct stat info;
 
     if (stat(targetPath, &info) != 0) {
@@ -37,7 +38,7 @@ void copyFilesAndDirectories(char* sourcePath, char* targetPath) {
         printf("ERROR: Target Directory %s Doesn't Exist\n", targetPath);
         return;
     }
-    printf("target dir opened\n");
+    
     
     while ((dp = readdir(sourceDirectory)) != NULL) {
         //skipping . and .. directories
@@ -47,14 +48,17 @@ void copyFilesAndDirectories(char* sourcePath, char* targetPath) {
 
         printf("%s/%s\n", sourcePath, dp->d_name);
 
-        char* newSourcePath = strndup(sourcePath, strlen(sourcePath));
+/*
+        char* newSourcePath = strndup(sourcePath, strlen(sourcePath)+1);
         strcat(newSourcePath, pathSlash);
         strcat(newSourcePath, dp->d_name);
 
-        char* newTargetPath = strndup(targetPath, strlen(targetPath));
+        char* newTargetPath = strndup(targetPath, strlen(targetPath)+1);
         strcat(newTargetPath, pathSlash);
         strcat(newTargetPath, dp->d_name);
-
+*/
+        snprintf(newSourcePath, sizeof(newSourcePath), "%s/%s", sourcePath, dp->d_name);
+        snprintf(newTargetPath, sizeof(newTargetPath), "%s/%s", targetPath, dp->d_name);
         printf("NEW PATHS: %s to %s\n", newSourcePath, newTargetPath);
 
         // If it is a folder, we recursively copy sub-directories
@@ -69,7 +73,7 @@ void copyFilesAndDirectories(char* sourcePath, char* targetPath) {
                 printf("Error opening source file to be copied!\n");
                 //continue;
             }
-            printf("source opened\n");
+            
             FILE* targetFile = fopen(newTargetPath, "wb");
             
             if (targetFile == NULL) {
@@ -82,7 +86,7 @@ void copyFilesAndDirectories(char* sourcePath, char* targetPath) {
             size_t bytes_read;
             while ((bytes_read = fread(buffer, 1, sizeof(buffer), sourceFile)) > 0) {
                 fwrite(buffer, 1, bytes_read, targetFile);
-                printf(".");
+                //printf(".");
             }
 
             printf("File %s copied successfully\n", newSourcePath);
@@ -108,7 +112,7 @@ int main(int argc, char *argv[]) {
     //strcpy(targetDirectoryName, sourceDirectoryName);
     //strcat(targetDirectoryName, target_suffix);
     
-    char* targetDirectoryName = strndup(sourceDirectoryName, strlen(sourceDirectoryName));
+    char* targetDirectoryName = strndup(sourceDirectoryName, strlen(sourceDirectoryName)+1);
     strcat(targetDirectoryName, target_suffix);
 
     //TODO: can add an optional 
