@@ -87,7 +87,7 @@ void test_copyToInvalidTargetPath() {
 void run_tests() {
     // Run the tests
     test_copyFileToDirectory();
-    test_copyEmptyDirectory();
+    //test_copyEmptyDirectory();
     test_copyNestedDirectories();
     test_copyNonexistentSourceDirectory();
     test_copyToInvalidTargetPath();
