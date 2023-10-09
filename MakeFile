@@ -2,11 +2,13 @@ CC = gcc
 
 SRC = backup.c
 
+TEST = tester.c
+
 OUT = backup
 
 all: $(OUT)
 
 $(OUT): $(SRC)
-	$(CC) -o $(OUT) $(SRC)
+	$(CC) -o $(OUT) $(SRC) $(TEST)
 clean:
 	rm -f $(OUT)

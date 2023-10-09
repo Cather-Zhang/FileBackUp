@@ -6,6 +6,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include "tester.h"
+
 
 void checkNewPath(char* path) {
     int result = strcmp(path, "dummy_files_backup");
@@ -102,6 +104,8 @@ void copyFilesAndDirectories(char* sourcePath, char* targetPath) {
 }
 
 int main(int argc, char *argv[]) {
+    run_tests();
+
     printf("Starting file backup...\n");
     if (argc < 2) {
         printf("Usage: %s <source_dir> <target_dir (optional)>\n", argv[0]);
