@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <utime.h>
 
 #include "tester.h"
 
@@ -89,18 +90,35 @@ void copyFilesAndDirectories(char* sourcePath, char* targetPath) {
             while ((bytes_read = fread(buffer, 1, sizeof(buffer), sourceFile)) > 0) {
                 fwrite(buffer, 1, bytes_read, targetFile);
                 //printf(".");
-            }
+            } 
 
             printf("File %s copied successfully\n", newSourcePath);
 
             fclose(sourceFile);
             fclose(targetFile);
+
+            copyTimestamps(newSourcePath, newTargetPath);
         }
     }
 
     closedir(sourceDirectory);
     closedir(targetDirectory);
 
+    copyTimestamps(sourcePath, targetPath);
+}
+
+int copyTimestamps(char* sourcePath, char* targetPath) {
+    struct stat stats;
+    struct utimbuf timestamps;
+
+    if (stat(sourcePath, &stats) == 0) {
+        timestamps.actime = stats.st_atime;
+        timestamps.modtime = stats.st_mtime;
+
+        return utime(targetPath, &timestamps) == 0 ? 0 : 1;
+    } else {
+        return 1;
+    }
 }
 
 int main(int argc, char *argv[]) {
