@@ -20,7 +20,7 @@ int copyFilesAndDirectories(char* sourcePath, char* targetPath) {
 
     DIR *sourceDirectory = opendir(sourcePath);
     if (!sourceDirectory) {
-        printf("ERROR: Source Directory %s Doesn't Exist\n", sourcePath);
+        perror("Unable to open source directory");
         return 1;
     }
 
@@ -99,11 +99,17 @@ int copyFilesAndDirectories(char* sourcePath, char* targetPath) {
 }
 
 int copyFileStats(char* source, char* target) {
-    if (chown(newTargetPath, sourceStat.st_uid, sourceStat.st_gid) == -1) {
+    struct stat sourceStat;
+    if (stat(source, &sourceStat) == -1) {
+        perror("Error getting folder stats");
+        return -1; // Handle the error as needed
+    }
+
+    if (chown(source, sourceStat.st_uid, sourceStat.st_gid) == -1) {
         perror("Failed to copy file ownership");
         return 1;
     }
-    if (fchmod(targetFile, sourceStat.st_mode) == -1) {
+    if (fchmod(target, sourceStat.st_mode) == -1) {
         perror("Failed to copy file permissions");
         return 1;
     }
@@ -112,7 +118,7 @@ int copyFileStats(char* source, char* target) {
     struct utimbuf utime_buf;
     utime_buf.actime = sourceStat.st_atime;
     utime_buf.modtime = sourceStat.st_mtime;
-    if (utime(targetFile, &utime_buf) == -1) {
+    if (utime(target, &utime_buf) == -1) {
         perror("Failed to copy file timestamps");
         return 1;
     }
@@ -151,7 +157,7 @@ int copyFolderStats(char* source, char* target) {
 }
 
 int main(int argc, char *argv[]) {
-    run_tests();
+    //run_tests();
 
     printf("Starting file backup...\n");
     if (argc < 2) {
@@ -175,10 +181,12 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+/*
     if (copyFilesAndDirectories(sourceDirectoryName, targetDirectoryName) != 0) {
         perror("Unable to backup folder!");
         return 1;
     }
+*/
 
     return 0;
 }
